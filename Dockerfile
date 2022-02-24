@@ -18,7 +18,7 @@ COPY . ./
 RUN chown -R django:django /app
 
 # Install dependencies
-RUN pip install --upgrade pip
+RUN pip install --upgrade pip==20.3.4
 RUN pip install gunicorn
 RUN pip install -r requirements.txt
 

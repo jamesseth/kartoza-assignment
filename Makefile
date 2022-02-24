@@ -62,3 +62,8 @@ restart: ## Restart containers.
 attach: ## Attach to docker-compose services eg.. make attach DC=django
 	docker exec -it \
 	$(shell docker ps -f name="$(PROJECT_NAME)_$(DC)" --format "{{.ID}}") bash
+
+.PHONY: pre-commit
+pre-commit: ## Run pre-commits.
+	[[ $$(pip3 list | grep pre-commit) ]] && true || pip3 install pre-commit
+	pre-commit run -a
