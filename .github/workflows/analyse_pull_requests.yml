@@ -1,0 +1,65 @@
+name: Analyze PR
+
+# Run these tests on PRs as well as commits on mater.
+on:
+  pull_request:
+    types: [opened, edited, reopened, synchronize]
+  push:
+    branches:
+      - "main"
+
+# Environment variables available to all jobs and steps in this workflow.
+env:
+  PYTHON_VERSION: 3.8
+  DJANGO_DB_DATABASE: postgres
+  DJANGO_DB_USERNAME: postgres
+  DJANGO_DB_PASSWORD: postgres
+  DJANGO_DB_HOST: localhost
+  DJANGO_DB_PORT: 5432
+  COVERAGE_RCFILE_PATH: .coveragerc
+  SECRET_KEY: ${{ secrets.SECRET_KEY }}
+
+jobs:
+  analyse:
+    name: Analyse Pull Request
+    runs-on: ubuntu-latest
+
+    services:
+      postgres:
+        image: postgres:11.5
+        env:
+          POSTGRES_USER: ${{ env.DJANGO_DB_USERNAME }}
+          POSTGRES_PASSWORD: ${{ env.DJANGO_DB_PASSWORD }}
+          POSTGRES_DB: ${{ env.DJANGO_DB_DATABASE}}
+          DJANGO_DB_PORT: ${{ env.DJANGO_DB_PORT }}
+        ports: ["5432:5432"]
+        options: --health-cmd pg_isready --health-interval 10s --health-timeout 5s --health-retries 5
+
+    steps:
+      - name: "Checkout repository on branch: ${{ github.REF }}"
+        uses: actions/checkout@v2
+
+      - name: Set up Python 3.x
+        uses: actions/setup-python@v2
+        with:
+          python-version: ${{ env.PYTHON_VERSION }}
+
+      - name: Install dependencies
+        run: |
+          pip install --upgrade pip setuptools wheel
+          pip install -r requirements.txt
+
+      - name: Lint with Pre-Commit on all files
+        run: |
+          pip install -r dev-requirements.txt
+          pre-commit run -a
+
+      - name: Create .env file.
+        run: echo GITHUB_ENV > .env
+
+      - name: Pytest with Coverage and Unit Test Report
+        run: |
+          coverage run -m pytest tests && coverage xml -o coverage.xml
+
+
+

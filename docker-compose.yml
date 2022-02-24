@@ -20,7 +20,7 @@ services:
     #   start_period: 30s
 
   db:
-    image: postgres:10-alpine
+    image: postgres:11-alpine
     env_file:
       - .env
     environment:
