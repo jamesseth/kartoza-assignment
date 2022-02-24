@@ -60,6 +60,3 @@ jobs:
       - name: Pytest with Coverage and Unit Test Report
         run: |
           coverage run -m pytest tests && coverage xml -o coverage.xml
-
-
-

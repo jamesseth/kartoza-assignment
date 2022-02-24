@@ -43,7 +43,7 @@ build: Dockerfile docker-compose.yml ## Build docker images.
 	docker-compose -p "$(PROJECT_ID)" build
 
 .PHONY: start
-start: ## Start Containers. 
+start: ## Start Containers.
 	docker-compose \
 	-p $(PROJECT_NAME) \
 	-f docker-compose.yml up \
